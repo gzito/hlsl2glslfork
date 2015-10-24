@@ -29,7 +29,7 @@ extern "C" {
 // Get basic wankery out of the way here...
 
 
-#ifdef _MSC_VER
+#if defined( _MSC_VER) && !defined(__S3E__) 
 #include <malloc.h>
 #define va_copy(a, b) a = b
 #define snprintf _snprintf  // !!! FIXME: not a safe replacement!

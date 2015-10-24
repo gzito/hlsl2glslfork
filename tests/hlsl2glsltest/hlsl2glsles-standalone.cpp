@@ -282,7 +282,9 @@ static bool InitializeOpenGL ()
 	// using core profile; always has GLSL
 	hasGLSL = true;
 #elif defined(__S3E__)
-	hasGLSL = IwGLGetInt(IW_GL_VERSION) >= 0x0200 ;
+	int glVersion = IwGLGetInt(IW_GL_VERSION) ;
+	hasGLSL = glVersion >= 0x0200 ;
+	printf( "OpenGL ES version: %ld\n", glVersion  ) ;
 #endif
 	
 	
@@ -530,7 +532,7 @@ struct IncludeContext
 };
 
 
-static bool C_DECL IncludeOpenCallback(bool isSystem, const char* fname, std::string& output, void* d)
+static bool C_DECL IncludeOpenCallback(bool isSystem, const char* fname, const char* parentfname, std::string& output, void* d)
 {
 	const IncludeContext* data = reinterpret_cast<IncludeContext*>(d);
 	
@@ -556,10 +558,9 @@ static bool TestFile (TestRun type,
 		printf ("  failed to read input file\n");
 		return false;
 	}
-	
-	ShHandle parser = Hlsl2Glsl_ConstructCompiler (kTypeLangs[type]);
-
 	const char* sourceStr = input.c_str();
+
+	ShHandle parser = Hlsl2Glsl_ConstructCompiler (kTypeLangs[type]);
 
 	bool res = true;
 
@@ -571,7 +572,8 @@ static bool TestFile (TestRun type,
 	Hlsl2Glsl_ParseCallbacks includeCB;
 	includeCB.includeOpenCallback = IncludeOpenCallback;
 	includeCB.data = &includeCtx;
-		
+	
+	// parse input file
 	int parseOk = Hlsl2Glsl_Parse (parser, sourceStr, version, &includeCB, options);
 	const char* infoLog = Hlsl2Glsl_GetInfoLog( parser );
 	if (kDumpShaderAST)
@@ -591,6 +593,7 @@ static bool TestFile (TestRun type,
 		};
 		Hlsl2Glsl_SetUserAttributeNames (parser, kAttribSemantic, kAttribString, 1);
 		
+		// Translate
 		int translateOk = Hlsl2Glsl_Translate (parser, entryPoint, version, options);
 		const char* infoLog = Hlsl2Glsl_GetInfoLog( parser );
 		if (translateOk)
@@ -753,7 +756,7 @@ int main (int argc, const char** argv)
 #ifndef __S3E__
 	if (argc < 2)
 	{
-		printf ("USAGE: hlsl2glsltest testfolder\n");
+		printf ("USAGE: hlsl2glslestest hlslshader-file\n");
 		return 1;
 	}
 #endif
@@ -766,65 +769,47 @@ int main (int argc, const char** argv)
 	
 	Hlsl2Glsl_Initialize ();
 
-#ifndef __S3E__
-	std::string baseFolder = argv[1];
-#else
-	std::string baseFolder = ".";
-#endif
-
 	size_t tests = 0;
 	size_t errors = 0;
 
 	// run_types are: 0=VERTEX, 1=FRAGMENT, 2=BOTH, 3=VERTEX_120, 4=FRAGMENT_120, 5=VERTEX_FAILURES, 6=FRAGMENT_FAILURES
-	for (int type = 0; type < NUM_RUN_TYPES; ++type)
-	{
-		printf ("TESTING %s...\n", kTypeName[type]);
-		const ETargetVersion version1 = kTargets1[type];		// GLSL 110 for run_types 0,1,5,6; GLSL 120 for run_types 2,3 & 4
-		const ETargetVersion version2 = kTargets2[type];		// GLSL_ES 100 for run_types 0 & 1
-		const ETargetVersion version3 = kTargets3[type];		// GLSL_ES 300 for run_types 0,1,3 & 4
-		std::string testFolder = baseFolder + "/" + kTypeName[type];
-		StringVector inputFiles = GetFiles (testFolder, "-in.txt");
+	int type = VERTEX ;
+	printf ("TESTING %s...\n", kTypeName[type]);
 
-		size_t n = inputFiles.size();
-		tests += n;
-		for (size_t i = 0; i < n; ++i)
-		{
-			std::string inname = inputFiles[i];
-			//if (inname != "_zzz-in.txt")
-			//	continue;
-			const bool preprocessorTest = (inname.find("pp-") == 0);
-			bool ok = true;
-			
-			printf ("test %s\n", inname.c_str());
-			if (type == BOTH) {
-				ok = TestCombinedFile(testFolder + "/" + inname, version1, hasOpenGL);
-				if (ok && version2 != ETargetVersionCount)
-					ok = TestCombinedFile(testFolder + "/" + inname, version2, hasOpenGL);
-			} else {
-				ok = TestFile(TestRun(type), testFolder + "/" + inname, version1, 0, hasOpenGL);
-				if (!preprocessorTest)
-				{
-					if (ok && version2 != ETargetVersionCount)
-						ok = TestFile(TestRun(type), testFolder + "/" + inname, version2, ETranslateOpEmitGLSL120ArrayInitWorkaround, hasOpenGL);
-					if (ok && version3 != ETargetVersionCount)
-						ok = TestFile(TestRun(type), testFolder + "/" + inname, version3, 0, hasOpenGL);
-				}
-			}
-			
-			if (!ok)
-				++errors;
-		}		
-	}
+	std::string testFolder = "./vertex" ;
 
+	tests = 1 ;
+#ifndef __S3E__
+	std::string inname = argv[1];
+#else
+	std::string inname  = "basic-mul-in.txt";
+	std::string outname = "basic-mul-outES.txt";
+#endif
+
+	bool ok = true;
+			
+	printf ("Testing %s\n", inname.c_str());
+
+
+	// ETargetGLSL_ES_100,	- OpenGL ES 2.0
+	// ETargetGLSL_110,		- OpenGL 2.0
+	// ETargetGLSL_120,		- OpenGL 2.1
+	// ETargetGLSL_140,		- OpenGL 3.1
+	// ETargetGLSL_ES_300	- OpenGL ES 3.0
+	// ETargetGLSL_330,		- OpenGL 3.3 - currently unsupported by hlsl2glsl
+
+	ok = TestFile(TestRun(type), testFolder + "/" + inname, testFolder + "/" + outname, "main",
+				  ETargetGLSL_ES_100, 0, hasOpenGL );
+			
 	clock_t time1 = clock();
 	float t = float(time1-time0) / float(CLOCKS_PER_SEC);
-	if (errors != 0)
-		printf ("%i tests, %i FAILED, %.2fs\n", (int)tests, (int)errors, t);
+	if (!ok)
+		printf ("FAILED, %.2fs\n", t);
 	else
-		printf ("%i tests succeeded, %.2fs\n", (int)tests, t);
+		printf ("Test succeeded, %.2fs\n", t);
 	
 	Hlsl2Glsl_Shutdown();
 	CleanupOpenGL();
 
-	return errors ? 1 : 0;
+	return ok ? 0 : 1 ;
 }

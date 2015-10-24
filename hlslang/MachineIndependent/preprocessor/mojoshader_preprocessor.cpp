@@ -200,7 +200,7 @@ void MOJOSHADER_hlslang_print_debug_token(const char *subsystem, const char *tok
 #if !MOJOSHADER_hlslang_FORCE_INCLUDE_CALLBACKS
 
 // !!! FIXME: most of these _MSC_VER should probably be _WINDOWS?
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__S3E__)
 #define WIN32_LEAN_AND_MEAN 1
 #include <windows.h>  // GL headers need this for WINGDIAPI definition.
 #else
@@ -216,7 +216,7 @@ int MOJOSHADER_hlslang_internal_include_open(MOJOSHADER_hlslang_includeType inct
                                      MOJOSHADER_hlslang_malloc m, MOJOSHADER_hlslang_free f,
                                      void *d)
 {
-#ifdef _MSC_VER
+#if defined( _MSC_VER) && !defined(__S3E__)
     WCHAR wpath[MAX_PATH];
     if (!MultiByteToWideChar(CP_UTF8, 0, fname, -1, wpath, MAX_PATH))
         return 0;

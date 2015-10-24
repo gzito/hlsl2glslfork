@@ -140,7 +140,7 @@ public:
    }
 #endif
 
-#if defined(_MSC_VER) && _MSC_VER >= 1300
+#if defined(_MSC_VER) && _MSC_VER >= 1300 && !defined(__S3E__)
    template<class Other>
 #ifdef USING_SGI_STL
       pool_allocator(const pool_allocator<Other>& p) /*: allocator(p.getAllocator())*/ { }

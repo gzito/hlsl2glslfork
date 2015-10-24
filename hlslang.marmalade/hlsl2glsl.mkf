@@ -1,0 +1,46 @@
+library
+{
+	".,hlsl2glsl"
+}
+
+includepaths
+{
+	../hlslang
+	../hlslang/MachineIndependent
+	../hlslang/OSDependent/s3e	
+}
+
+files
+{
+	(..)
+	["Header Files"]
+    hlslang/MachineIndependent/Initialize.h
+    hlslang/MachineIndependent/localintermediate.h
+    hlslang/MachineIndependent/ParseHelper.h
+    hlslang/MachineIndependent/preprocessor/mojoshader.h
+    hlslang/MachineIndependent/preprocessor/mojoshader_internal.h
+    hlslang/MachineIndependent/RemoveTree.h
+    hlslang/MachineIndependent/hlslang_tab.h
+    hlslang/MachineIndependent/preprocessor/sourceloc.h
+    hlslang/Include/BaseTypes.h
+    hlslang/Include/Common.h
+    hlslang/Include/InfoSink.h
+    hlslang/Include/InitializeGlobals.h
+    hlslang/Include/InitializeParseContext.h
+    hlslang/Include/intermediate.h
+    hlslang/Include/PoolAlloc.h
+    hlslang/MachineIndependent/SymbolTable.h
+    hlslang/Include/Types.h
+    include/hlsl2glsl.h
+    hlslang/GLSLCodeGen/glslCommon.h
+    hlslang/GLSLCodeGen/glslFunction.h
+    hlslang/GLSLCodeGen/glslOutput.h
+    hlslang/GLSLCodeGen/glslStruct.h
+    hlslang/GLSLCodeGen/glslSymbol.h
+    hlslang/GLSLCodeGen/hlslCrossCompiler.h
+    hlslang/GLSLCodeGen/hlslLinker.h
+    hlslang/GLSLCodeGen/hlslSupportLib.h
+    hlslang/GLSLCodeGen/propagateMutable.h
+    hlslang/GLSLCodeGen/typeSamplers.h
+    hlslang/OSDependent/s3e/osinclude.h
+}

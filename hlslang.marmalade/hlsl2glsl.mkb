@@ -1,0 +1,49 @@
+option lib
+subproject hlsl2glsl
+
+define GENERIC_COMPILER
+define _COMPILER
+define _HAS_ITERATOR_DEBUGGING=0
+define _HAS_EXCEPTIONS=0
+define _SECURE_SCL=0
+
+options
+{
+	optimise-speed=1
+	cxx11
+}
+
+files
+{
+	(..)
+	["Source Files"]
+    hlslang/MachineIndependent/ConstantFolding.cpp
+    hlslang/MachineIndependent/HLSL2GLSL.cpp
+    hlslang/MachineIndependent/InfoSink.cpp
+    hlslang/MachineIndependent/Initialize.cpp
+    hlslang/MachineIndependent/Intermediate.cpp
+    hlslang/MachineIndependent/intermOut.cpp
+    hlslang/MachineIndependent/IntermTraverse.cpp
+    hlslang/MachineIndependent/ParseHelper.cpp
+    hlslang/MachineIndependent/PoolAlloc.cpp
+    hlslang/MachineIndependent/preprocessor/mojoshader.cpp
+    hlslang/MachineIndependent/preprocessor/mojoshader_common.cpp
+    hlslang/MachineIndependent/preprocessor/mojoshader_lexer.cpp
+    hlslang/MachineIndependent/preprocessor/mojoshader_preprocessor.cpp
+    hlslang/MachineIndependent/preprocessor/sourceloc.cpp
+    hlslang/MachineIndependent/RemoveTree.cpp
+    hlslang/MachineIndependent/SymbolTable.cpp
+    hlslang/MachineIndependent/Gen_hlslang.cpp
+    hlslang/MachineIndependent/Gen_hlslang_tab.cpp
+    hlslang/GLSLCodeGen/glslCommon.cpp
+    hlslang/GLSLCodeGen/glslFunction.cpp
+    hlslang/GLSLCodeGen/glslOutput.cpp
+    hlslang/GLSLCodeGen/glslStruct.cpp
+    hlslang/GLSLCodeGen/glslSymbol.cpp
+    hlslang/GLSLCodeGen/hlslCrossCompiler.cpp
+    hlslang/GLSLCodeGen/hlslLinker.cpp
+    hlslang/GLSLCodeGen/hlslSupportLib.cpp
+    hlslang/GLSLCodeGen/propagateMutable.cpp
+    hlslang/GLSLCodeGen/typeSamplers.cpp
+    hlslang/OSDependent/s3e/ossource.cpp
+}

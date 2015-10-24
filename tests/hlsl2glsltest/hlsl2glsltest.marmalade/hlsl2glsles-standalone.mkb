@@ -1,0 +1,26 @@
+#!/usr/bin/env mkb
+
+
+define _HAS_ITERATOR_DEBUGGING=0
+define _HAS_EXCEPTIONS=0
+define _SECURE_SCL=0
+
+options
+{
+	s3e-data-dir=../..
+	optimise-speed=1
+	cxx11
+	module_path=../../../hlslang.marmalade
+}
+
+subprojects
+{
+	hlsl2glsl
+	iwgl
+}
+
+files
+{
+	(..)
+	hlsl2glsles-standalone.cpp
+}
