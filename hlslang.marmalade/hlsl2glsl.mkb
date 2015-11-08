@@ -10,7 +10,7 @@ define _SECURE_SCL=0
 options
 {
 	optimise-speed=1
-	cxx11
+#	cxx11
 }
 
 files
